@@ -887,15 +887,9 @@ h1 {
   cursor: pointer;
   box-shadow: 0 14px 32px rgba(0, 0, 0, .28);
   transition: transform .22s ease, box-shadow .22s ease, opacity .22s ease;
+  font-size: 22px;
 }
-
-.fixed-action-btn svg,
-.go-top-btn svg {
-  width: 27px;
-  height: 27px;
-  fill: currentColor;
-}
-
+ 
 .phone-btn {
   background: linear-gradient(135deg, #0a0a0a, #183767);
 }
@@ -921,6 +915,7 @@ h1 {
     width: 20px;
     height: 20px;
     transform: rotate(90deg);
+    fill: currentColor;
 }
 
 .go-top-btn.show {
