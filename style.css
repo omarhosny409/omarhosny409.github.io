@@ -877,8 +877,8 @@ h1 {
 
 .fixed-action-btn,
 .go-top-btn {
-  width: 58px;
-  height: 58px;
+  width: 50px;
+  height: 50px;
   display: grid;
   place-items: center;
   border: 0;
@@ -891,9 +891,10 @@ h1 {
 
 .fixed-action-btn svg,
 .go-top-btn svg {
-  width: 27px;
-  height: 27px;
+  width: 20px;
+  height: 20px;
   fill: currentColor;
+  transform: rotate(90deg);
 }
 
 .phone-btn {
