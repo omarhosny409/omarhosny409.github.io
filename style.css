@@ -864,3 +864,94 @@ h1 {
     transition-duration: .01ms !important;
   }
 }
+
+/* Fixed quick actions */
+.fixed-contact-actions {
+  position: fixed;
+  right: 22px;
+  bottom: 24px;
+  z-index: 80;
+  display: grid;
+  gap: 14px;
+}
+
+.fixed-action-btn,
+.go-top-btn {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, .28);
+  transition: transform .22s ease, box-shadow .22s ease, opacity .22s ease;
+}
+
+.fixed-action-btn svg,
+.go-top-btn svg {
+  width: 27px;
+  height: 27px;
+  fill: currentColor;
+}
+
+.phone-btn {
+  background: linear-gradient(135deg, #2d72d9, #174ea6);
+}
+
+.whatsapp-btn {
+  background: linear-gradient(135deg, #25d366, #128c4a);
+}
+
+.go-top-btn {
+  position: fixed;
+  left: 22px;
+  bottom: 24px;
+  z-index: 80;
+  background: linear-gradient(135deg, #4285f4, #1f5fbf);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+}
+
+.go-top-btn.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.fixed-action-btn:hover,
+.go-top-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .36);
+}
+
+.go-top-btn.show:hover {
+  transform: translateY(-4px);
+}
+
+@media (max-width: 560px) {
+  .fixed-contact-actions {
+    right: 14px;
+    bottom: 18px;
+    gap: 10px;
+  }
+
+  .fixed-action-btn,
+  .go-top-btn {
+    width: 52px;
+    height: 52px;
+  }
+
+  .fixed-action-btn svg,
+  .go-top-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .go-top-btn {
+    left: 14px;
+    bottom: 18px;
+  }
+}
