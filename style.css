@@ -897,7 +897,7 @@ h1 {
 }
 
 .phone-btn {
-  background: linear-gradient(135deg, #2d72d9, #174ea6);
+  background: linear-gradient(135deg, #0a0a0a, #183767);
 }
 
 .whatsapp-btn {
@@ -909,10 +909,12 @@ h1 {
   left: 22px;
   bottom: 24px;
   z-index: 80;
-  background: linear-gradient(135deg, #4285f4, #1f5fbf);
   opacity: 0;
   pointer-events: none;
   transform: translateY(12px);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .045));
+  box-shadow: var(--shadow);
 }
 
 .go-top-btn.show {
