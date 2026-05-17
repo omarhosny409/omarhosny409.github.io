@@ -139,7 +139,7 @@ const translations = {
     'hero.visualAria': 'صورة تقديم عمر حسني',
     'hero.portraitAlt': 'صورة احترافية لعمر حسني',
     'hero.available': 'متاح الآن',
-    'hero.frontend': 'فرونت إند',
+    'hero.frontend': 'Full Stack',
     'hero.skills': 'WordPress • UI • Responsive',
     'stats.aria': 'أرقام ومميزات المشاريع',
     'stats.responsive': 'تصميم متجاوب',
