@@ -720,11 +720,114 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   });
 }
 
-const cursorDot = document.querySelector('.cursor-dot');
-const cursorGlow = document.querySelector('.cursor-glow');
-if (cursorDot) cursorDot.remove();
-if (cursorGlow) cursorGlow.remove();
-document.body.classList.remove('has-custom-cursor', 'cursor-active', 'cursor-hover');
+(function initProfessionalCursor() {
+  const cursorDot = document.querySelector('.cursor-dot');
+  const cursorGlow = document.querySelector('.cursor-glow');
+  const finePointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+  if (!cursorDot || !cursorGlow) return;
+
+  const clickableSelector = [
+    'a[href]',
+    'button',
+    'summary',
+    'label',
+    'input',
+    'textarea',
+    'select',
+    '[role="button"]',
+    '[tabindex]:not([tabindex="-1"])',
+    '.btn',
+    '.nav-cta',
+    '.icon-toggle',
+    '.mobile-menu-toggle',
+    '.project-media',
+    '.project-scroll-media',
+    '.project-hover-hint',
+    '.social-link',
+    '.nav-social-link',
+    '.fixed-action-btn',
+    '.go-top-btn',
+    '.lightbox-controls button',
+    '.lightbox-backdrop'
+  ].join(',');
+
+  let mouseX = -120;
+  let mouseY = -120;
+  let currentX = mouseX;
+  let currentY = mouseY;
+  let rafId = null;
+  let enabled = false;
+
+  const render = () => {
+    currentX += (mouseX - currentX) * 0.34;
+    currentY += (mouseY - currentY) * 0.34;
+
+    const dotTransform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+    const glowTransform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+
+    cursorDot.style.transform = dotTransform;
+    cursorGlow.style.transform = glowTransform;
+    rafId = requestAnimationFrame(render);
+  };
+
+  const setHoverState = (target) => {
+    const isClickable = Boolean(target && target.closest && target.closest(clickableSelector));
+    document.body.classList.toggle('cursor-hover', isClickable);
+  };
+
+  const onMouseMove = (event) => {
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+    document.body.classList.add('cursor-active');
+    setHoverState(event.target);
+  };
+
+  const onMouseDown = () => document.body.classList.add('cursor-pressed');
+  const onMouseUp = () => document.body.classList.remove('cursor-pressed');
+  const onMouseLeave = () => {
+    document.body.classList.remove('cursor-active', 'cursor-hover', 'cursor-pressed');
+  };
+
+  const enable = () => {
+    if (enabled || !finePointerQuery.matches) return;
+    enabled = true;
+    document.body.classList.add('has-custom-cursor');
+    document.addEventListener('mousemove', onMouseMove, { passive: true });
+    document.addEventListener('mousedown', onMouseDown, { passive: true });
+    document.addEventListener('mouseup', onMouseUp, { passive: true });
+    document.addEventListener('mouseover', (event) => setHoverState(event.target), { passive: true });
+    document.documentElement.addEventListener('mouseleave', onMouseLeave, { passive: true });
+    rafId = requestAnimationFrame(render);
+  };
+
+  const disable = () => {
+    if (!enabled) return;
+    enabled = false;
+    document.body.classList.remove('has-custom-cursor', 'cursor-active', 'cursor-hover', 'cursor-pressed');
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mousedown', onMouseDown);
+    document.removeEventListener('mouseup', onMouseUp);
+    document.documentElement.removeEventListener('mouseleave', onMouseLeave);
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+  };
+
+  const syncCursorMode = () => {
+    if (finePointerQuery.matches) {
+      enable();
+    } else {
+      disable();
+    }
+  };
+
+  syncCursorMode();
+  if (typeof finePointerQuery.addEventListener === 'function') {
+    finePointerQuery.addEventListener('change', syncCursorMode);
+  } else if (typeof finePointerQuery.addListener === 'function') {
+    finePointerQuery.addListener(syncCursorMode);
+  }
+})();
 
 (function initMobileScrollHeader() {
   if (!siteHeader) return;
