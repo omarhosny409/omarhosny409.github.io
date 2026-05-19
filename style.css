@@ -477,7 +477,7 @@ h3 {
 
 h1 {
   max-width: 820px;
-  font-size: clamp(44px, 7vw, 84px);
+  font-size: 54px;
 }
 
 .hero-text {
