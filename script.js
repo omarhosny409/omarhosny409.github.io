@@ -724,4 +724,3 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
 
 
 /* Removed: (function initMobileScrollHeader() block. Native cursor and non-fixed header restored. */
-
