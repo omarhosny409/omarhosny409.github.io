@@ -537,7 +537,6 @@ if (projectScreens.length) {
 }
 
 
-
 const projectLightboxModal = document.querySelector('[data-project-lightbox-modal]');
 const projectLightboxImage = document.querySelector('[data-lightbox-image]');
 const projectLightboxTitle = document.querySelector('[data-lightbox-title]');
@@ -555,14 +554,6 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   let dragStart = null;
   let lastFocusedElement = null;
 
-  const getProjectImage = (screen) => screen ? screen.querySelector('[data-project-scroll-image]') : null;
-
-  const getImageSource = (image) => {
-    if (!image) return '';
-    const source = image.dataset.fullSrc || image.getAttribute('src') || image.currentSrc || '';
-    return new URL(source, window.location.href).href;
-  };
-
   const applyLightboxTransform = () => {
     projectLightboxImage.style.transform = `translate3d(${lightboxTranslateX}px, ${lightboxTranslateY}px, 0) scale(${lightboxScale})`;
     projectLightboxStage.classList.toggle('is-zoomed', lightboxScale > 1.01);
@@ -577,12 +568,13 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   };
 
   const setLightboxZoom = (nextScale) => {
-    const next = Number(nextScale);
-    if (!Number.isFinite(next)) return;
-    lightboxScale = Math.max(1, Math.min(4, Number(next.toFixed(2))));
+    const previousScale = lightboxScale;
+    lightboxScale = Math.max(1, Math.min(4, Number(nextScale.toFixed(2))));
 
-    if (lightboxScale <= 1.01) {
-      lightboxScale = 1;
+    if (lightboxScale === 1) {
+      lightboxTranslateX = 0;
+      lightboxTranslateY = 0;
+    } else if (previousScale === 1) {
       lightboxTranslateX = 0;
       lightboxTranslateY = 0;
     }
@@ -591,29 +583,20 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   };
 
   const openProjectLightbox = (screen) => {
-    const image = getProjectImage(screen);
-    const src = getImageSource(image);
-    if (!src) return;
+    const image = screen.querySelector('[data-project-scroll-image]');
+    if (!image) return;
 
     lastFocusedElement = document.activeElement;
-    projectLightboxImage.onload = () => {
-      projectLightboxImage.classList.remove('is-loading');
-      projectLightboxStage.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    };
-    projectLightboxImage.onerror = () => {
-      projectLightboxImage.classList.add('is-broken');
-    };
-    projectLightboxImage.classList.add('is-loading');
-    projectLightboxImage.classList.remove('is-broken');
-    projectLightboxImage.src = src;
-    projectLightboxImage.alt = image?.alt || translate('projects.openPreview');
+    projectLightboxImage.src = image.currentSrc || image.src;
+    projectLightboxImage.alt = image.alt || translate('projects.openPreview');
 
     if (projectLightboxTitle) {
-      const titleKey = screen?.dataset.lightboxTitleKey;
-      projectLightboxTitle.textContent = titleKey ? translate(titleKey) : (image?.alt || translate('projects.openPreview'));
+      const titleKey = screen.dataset.lightboxTitleKey;
+      projectLightboxTitle.textContent = titleKey ? translate(titleKey) : (image.alt || translate('projects.openPreview'));
     }
 
     resetLightboxZoom();
+    projectLightboxStage.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     projectLightboxModal.classList.add('is-open');
     projectLightboxModal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('lightbox-open');
@@ -627,7 +610,6 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
     projectLightboxModal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('lightbox-open');
     projectLightboxImage.removeAttribute('src');
-    projectLightboxImage.classList.remove('is-loading', 'is-broken');
     resetLightboxZoom();
 
     if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
@@ -636,16 +618,7 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   };
 
   projectLightboxOpeners.forEach((screen) => {
-    const image = getProjectImage(screen);
-    if (image && !image.dataset.fullSrc) {
-      image.dataset.fullSrc = image.getAttribute('src') || '';
-    }
-
-    screen.addEventListener('click', (event) => {
-      event.preventDefault();
-      openProjectLightbox(screen);
-    });
-
+    screen.addEventListener('click', () => openProjectLightbox(screen));
     screen.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
@@ -672,7 +645,6 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
 
   projectLightboxStage.addEventListener('wheel', (event) => {
     if (!projectLightboxModal.classList.contains('is-open')) return;
-    if (!event.ctrlKey && Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
     event.preventDefault();
     setLightboxZoom(lightboxScale + (event.deltaY < 0 ? 0.18 : -0.18));
   }, { passive: false });
@@ -720,164 +692,49 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   });
 }
 
-(function initProfessionalCursor() {
-  const cursorDot = document.querySelector('.cursor-dot');
-  const cursorGlow = document.querySelector('.cursor-glow');
-  const finePointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+const supportsCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+const cursorDot = document.querySelector('.cursor-dot');
+const cursorGlow = document.querySelector('.cursor-glow');
 
-  if (!cursorDot || !cursorGlow) return;
+if (supportsCustomCursor && !prefersReducedMotion && cursorDot && cursorGlow) {
+  document.body.classList.add('has-custom-cursor');
 
-  const clickableSelector = [
-    'a[href]',
-    'button',
-    'summary',
-    'label',
-    'input',
-    'textarea',
-    'select',
-    '[role="button"]',
-    '[tabindex]:not([tabindex="-1"])',
-    '.btn',
-    '.nav-cta',
-    '.icon-toggle',
-    '.mobile-menu-toggle',
-    '.project-media',
-    '.project-scroll-media',
-    '.project-hover-hint',
-    '.social-link',
-    '.nav-social-link',
-    '.fixed-action-btn',
-    '.go-top-btn',
-    '.lightbox-controls button',
-    '.lightbox-backdrop'
-  ].join(',');
+  let mouseX = -100;
+  let mouseY = -100;
+  let glowX = mouseX;
+  let glowY = mouseY;
 
-  let mouseX = -120;
-  let mouseY = -120;
-  let currentX = mouseX;
-  let currentY = mouseY;
-  let rafId = null;
-  let enabled = false;
+  const updateCursor = () => {
+    glowX += (mouseX - glowX) * 0.16;
+    glowY += (mouseY - glowY) * 0.16;
 
-  const render = () => {
-    currentX += (mouseX - currentX) * 0.34;
-    currentY += (mouseY - currentY) * 0.34;
+    cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+    cursorGlow.style.transform = `translate3d(${glowX}px, ${glowY}px, 0) translate(-50%, -50%)`;
 
-    const dotTransform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
-    const glowTransform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
-
-    cursorDot.style.transform = dotTransform;
-    cursorGlow.style.transform = glowTransform;
-    rafId = requestAnimationFrame(render);
+    requestAnimationFrame(updateCursor);
   };
 
-  const setHoverState = (target) => {
-    const isClickable = Boolean(target && target.closest && target.closest(clickableSelector));
-    document.body.classList.toggle('cursor-hover', isClickable);
-  };
-
-  const onMouseMove = (event) => {
+  document.addEventListener('pointermove', (event) => {
     mouseX = event.clientX;
     mouseY = event.clientY;
     document.body.classList.add('cursor-active');
-    setHoverState(event.target);
-  };
+  }, { passive: true });
 
-  const onMouseDown = () => document.body.classList.add('cursor-pressed');
-  const onMouseUp = () => document.body.classList.remove('cursor-pressed');
-  const onMouseLeave = () => {
-    document.body.classList.remove('cursor-active', 'cursor-hover', 'cursor-pressed');
-  };
+  document.addEventListener('pointerleave', () => {
+    document.body.classList.remove('cursor-active');
+  });
 
-  const enable = () => {
-    if (enabled || !finePointerQuery.matches) return;
-    enabled = true;
-    document.body.classList.add('has-custom-cursor');
-    document.addEventListener('mousemove', onMouseMove, { passive: true });
-    document.addEventListener('mousedown', onMouseDown, { passive: true });
-    document.addEventListener('mouseup', onMouseUp, { passive: true });
-    document.addEventListener('mouseover', (event) => setHoverState(event.target), { passive: true });
-    document.documentElement.addEventListener('mouseleave', onMouseLeave, { passive: true });
-    rafId = requestAnimationFrame(render);
-  };
-
-  const disable = () => {
-    if (!enabled) return;
-    enabled = false;
-    document.body.classList.remove('has-custom-cursor', 'cursor-active', 'cursor-hover', 'cursor-pressed');
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mousedown', onMouseDown);
-    document.removeEventListener('mouseup', onMouseUp);
-    document.documentElement.removeEventListener('mouseleave', onMouseLeave);
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = null;
-  };
-
-  const syncCursorMode = () => {
-    if (finePointerQuery.matches) {
-      enable();
-    } else {
-      disable();
+  document.addEventListener('pointerover', (event) => {
+    if (event.target.closest('a, button, input, textarea, select, [role="button"]')) {
+      document.body.classList.add('cursor-hover');
     }
-  };
+  });
 
-  syncCursorMode();
-  if (typeof finePointerQuery.addEventListener === 'function') {
-    finePointerQuery.addEventListener('change', syncCursorMode);
-  } else if (typeof finePointerQuery.addListener === 'function') {
-    finePointerQuery.addListener(syncCursorMode);
-  }
-})();
-
-(function initMobileScrollHeader() {
-  if (!siteHeader) return;
-
-  const mobileQuery = window.matchMedia('(max-width: 780px)');
-  let lastScrollY = window.scrollY || 0;
-  let ticking = false;
-
-  const setMobileScrollState = () => {
-    const currentY = Math.max(0, window.scrollY || 0);
-
-    if (!mobileQuery.matches) {
-      document.body.classList.remove('mobile-at-top', 'mobile-scroll-up', 'mobile-scroll-down');
-      lastScrollY = currentY;
-      return;
+  document.addEventListener('pointerout', (event) => {
+    if (event.target.closest('a, button, input, textarea, select, [role="button"]')) {
+      document.body.classList.remove('cursor-hover');
     }
+  });
 
-    if (currentY <= 16) {
-      document.body.classList.add('mobile-at-top');
-      document.body.classList.remove('mobile-scroll-up', 'mobile-scroll-down');
-      lastScrollY = currentY;
-      return;
-    }
-
-    document.body.classList.remove('mobile-at-top');
-
-    if (Math.abs(currentY - lastScrollY) < 6) return;
-
-    if (currentY > lastScrollY && !document.body.classList.contains('nav-open')) {
-      document.body.classList.add('mobile-scroll-down');
-      document.body.classList.remove('mobile-scroll-up');
-      setMobileMenu(false);
-    } else if (currentY < lastScrollY) {
-      document.body.classList.add('mobile-scroll-up');
-      document.body.classList.remove('mobile-scroll-down');
-    }
-
-    lastScrollY = currentY;
-  };
-
-  const onScroll = () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      setMobileScrollState();
-      ticking = false;
-    });
-  };
-
-  setMobileScrollState();
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', setMobileScrollState, { passive: true });
-})();
+  updateCursor();
+}
