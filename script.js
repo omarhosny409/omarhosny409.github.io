@@ -22,6 +22,9 @@ const translations = {
     'nav.projects': 'My Projects',
     'nav.contact': 'Contact',
     'nav.whatsapp': 'WhatsApp',
+    'nav.menu': 'Menu',
+    'nav.menuOpen': 'Open menu',
+    'nav.menuClose': 'Close menu',
     'controls.themeAria': 'Toggle color theme',
     'controls.langAria': 'Switch language',
     'controls.dark': 'Dark',
@@ -67,8 +70,8 @@ const translations = {
     'work.card3Text': 'Structured offer, benefits, and contact-focused sections.',
     'projects.eyebrow': 'My Projects',
     'projects.title': 'Project showcase widget',
-    'projects.text': 'A polished widget for full-page project screenshots. Hover any project image to scroll through the full website preview at one steady speed.',
-    'projects.hoverHint': 'Hover to scroll full page',
+    'projects.text': 'A polished widget for full-page project screenshots. Hover to scroll the preview, or click any image to open it with zoom.',
+    'projects.hoverHint': 'Hover / tap to preview',
     'projects.placeholder': 'Add project image here',
     'projects.card1Title': 'Aroma IPTV Website',
     'projects.card1Text': 'Full-page website preview with an auto-scroll hover effect, built to present long landing pages in a clean portfolio card.',
@@ -81,6 +84,14 @@ const translations = {
     'projects.tagUi': 'UI Design',
     'projects.tagDev': 'Frontend',
     'projects.tagResponsive': 'Responsive',
+    'projects.openPreview': 'Open project preview',
+    'projects.lightboxAria': 'Project image preview',
+    'projects.controlsAria': 'Project preview controls',
+    'projects.closePreview': 'Close preview',
+    'projects.zoomIn': 'Zoom in',
+    'projects.zoomOut': 'Zoom out',
+    'projects.resetZoom': 'Reset zoom',
+    'projects.lightboxHelp': 'Use + / - to zoom. Drag the image when zoomed.',
     'process.eyebrow': 'Process',
     'process.title': 'Simple workflow, polished result',
     'process.step1Title': 'Plan',
@@ -96,6 +107,9 @@ const translations = {
     'contact.email': 'Send email',
     'footer.rights': 'All rights reserved.',
     'social.aria': 'Social profiles',
+    'social.instagram': 'Instagram',
+    'social.linkedin': 'LinkedIn',
+    'social.facebook': 'Facebook',
     'fixed.aria': 'Quick contact actions',
     'fixed.call': 'Call Omar Hosny',
     'fixed.whatsapp': 'WhatsApp Omar Hosny',
@@ -123,6 +137,9 @@ const translations = {
     'nav.projects': 'أعمالي',
     'nav.contact': 'تواصل',
     'nav.whatsapp': 'واتساب',
+    'nav.menu': 'القائمة',
+    'nav.menuOpen': 'فتح القائمة',
+    'nav.menuClose': 'إغلاق القائمة',
     'controls.themeAria': 'تبديل الوضع الداكن والفاتح',
     'controls.langAria': 'تبديل اللغة',
     'controls.dark': 'داكن',
@@ -168,8 +185,8 @@ const translations = {
     'work.card3Text': 'عرض خدمة منظم، مميزات واضحة، وأقسام مركزة على التواصل.',
     'projects.eyebrow': 'أعمالي',
     'projects.title': 'ودجيت عرض المشاريع',
-    'projects.text': 'ودجيت مصقول لعرض صور المشاريع الطويلة. اعمل Hover على أي صورة مشروع علشان تسكرول لحد آخر الصفحة بسرعة ثابتة.',
-    'projects.hoverHint': 'اعمل Hover علشان الصورة تسكرول كاملة',
+    'projects.text': 'ودجيت مصقول لعرض صور المشاريع الطويلة. اعمل Hover للسكرول، أو اضغط على أي صورة لفتحها مع الزوم.',
+    'projects.hoverHint': 'Hover / اضغط للمعاينة',
     'projects.placeholder': 'ضع صورة المشروع هنا',
     'projects.card1Title': 'موقع Aroma IPTV',
     'projects.card1Text': 'عرض كامل للموقع بتأثير Auto Scroll عند الـ Hover، مناسب لعرض اللاندنج بيدج الطويلة داخل كارت بورتفوليو نظيف.',
@@ -182,6 +199,14 @@ const translations = {
     'projects.tagUi': 'UI Design',
     'projects.tagDev': 'Frontend',
     'projects.tagResponsive': 'Responsive',
+    'projects.openPreview': 'فتح معاينة المشروع',
+    'projects.lightboxAria': 'معاينة صورة المشروع',
+    'projects.controlsAria': 'أدوات التحكم في المعاينة',
+    'projects.closePreview': 'إغلاق المعاينة',
+    'projects.zoomIn': 'تكبير',
+    'projects.zoomOut': 'تصغير',
+    'projects.resetZoom': 'إعادة ضبط الزوم',
+    'projects.lightboxHelp': 'استخدم + / - للزوم. اسحب الصورة عند التكبير.',
     'process.eyebrow': 'طريقة الشغل',
     'process.title': 'خطوات بسيطة ونتيجة مصقولة',
     'process.step1Title': 'تخطيط',
@@ -197,6 +222,9 @@ const translations = {
     'contact.email': 'ابعت إيميل',
     'footer.rights': 'كل الحقوق محفوظة.',
     'social.aria': 'حسابات السوشيال',
+    'social.instagram': 'إنستجرام',
+    'social.linkedin': 'لينكدإن',
+    'social.facebook': 'فيسبوك',
     'fixed.aria': 'أزرار تواصل سريعة',
     'fixed.call': 'اتصل بعمر حسني',
     'fixed.whatsapp': 'راسل عمر حسني على واتساب',
@@ -294,6 +322,47 @@ if (langToggle) {
     applyLanguage(getCurrentLang() === 'en' ? 'ar' : 'en');
     applyTheme(getCurrentTheme());
   });
+}
+
+
+const siteHeader = document.querySelector('.site-header');
+const mobileMenuToggle = document.querySelector('[data-mobile-menu-toggle]');
+const mobileMenuLinks = document.querySelectorAll('.main-nav a[href^="#"], .header-actions a[href^="#"]');
+
+const syncMobileMenuLabel = () => {
+  if (!mobileMenuToggle || !siteHeader) return;
+  const isOpen = siteHeader.classList.contains('is-menu-open');
+  mobileMenuToggle.setAttribute('aria-expanded', String(isOpen));
+  mobileMenuToggle.setAttribute('aria-label', translate(isOpen ? 'nav.menuClose' : 'nav.menuOpen'));
+};
+
+const setMobileMenu = (open) => {
+  if (!siteHeader || !mobileMenuToggle) return;
+  siteHeader.classList.toggle('is-menu-open', open);
+  document.body.classList.toggle('nav-open', open);
+  syncMobileMenuLabel();
+};
+
+if (mobileMenuToggle) {
+  syncMobileMenuLabel();
+
+  mobileMenuToggle.addEventListener('click', () => {
+    setMobileMenu(!siteHeader.classList.contains('is-menu-open'));
+  });
+
+  mobileMenuLinks.forEach((link) => {
+    link.addEventListener('click', () => setMobileMenu(false));
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 780) {
+      setMobileMenu(false);
+    }
+  }, { passive: true });
+
+  if (langToggle) {
+    langToggle.addEventListener('click', syncMobileMenuLabel);
+  }
 }
 
 const siteLoader = document.getElementById('siteLoader');
@@ -465,6 +534,162 @@ const updateProjectScrollDistances = () => {
 if (projectScreens.length) {
   updateProjectScrollDistances();
   window.addEventListener('resize', updateProjectScrollDistances, { passive: true });
+}
+
+
+const projectLightboxModal = document.querySelector('[data-project-lightbox-modal]');
+const projectLightboxImage = document.querySelector('[data-lightbox-image]');
+const projectLightboxTitle = document.querySelector('[data-lightbox-title]');
+const projectLightboxStage = document.querySelector('[data-lightbox-stage]');
+const projectLightboxOpeners = document.querySelectorAll('[data-project-lightbox]');
+const lightboxCloseButtons = document.querySelectorAll('[data-lightbox-close]');
+const lightboxZoomIn = document.querySelector('[data-lightbox-zoom-in]');
+const lightboxZoomOut = document.querySelector('[data-lightbox-zoom-out]');
+const lightboxReset = document.querySelector('[data-lightbox-reset]');
+
+if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
+  let lightboxScale = 1;
+  let lightboxTranslateX = 0;
+  let lightboxTranslateY = 0;
+  let dragStart = null;
+  let lastFocusedElement = null;
+
+  const applyLightboxTransform = () => {
+    projectLightboxImage.style.transform = `translate3d(${lightboxTranslateX}px, ${lightboxTranslateY}px, 0) scale(${lightboxScale})`;
+    projectLightboxStage.classList.toggle('is-zoomed', lightboxScale > 1.01);
+  };
+
+  const resetLightboxZoom = () => {
+    lightboxScale = 1;
+    lightboxTranslateX = 0;
+    lightboxTranslateY = 0;
+    projectLightboxStage.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    applyLightboxTransform();
+  };
+
+  const setLightboxZoom = (nextScale) => {
+    const previousScale = lightboxScale;
+    lightboxScale = Math.max(1, Math.min(4, Number(nextScale.toFixed(2))));
+
+    if (lightboxScale === 1) {
+      lightboxTranslateX = 0;
+      lightboxTranslateY = 0;
+    } else if (previousScale === 1) {
+      lightboxTranslateX = 0;
+      lightboxTranslateY = 0;
+    }
+
+    applyLightboxTransform();
+  };
+
+  const openProjectLightbox = (screen) => {
+    const image = screen.querySelector('[data-project-scroll-image]');
+    if (!image) return;
+
+    lastFocusedElement = document.activeElement;
+    projectLightboxImage.src = image.currentSrc || image.src;
+    projectLightboxImage.alt = image.alt || translate('projects.openPreview');
+
+    if (projectLightboxTitle) {
+      const titleKey = screen.dataset.lightboxTitleKey;
+      projectLightboxTitle.textContent = titleKey ? translate(titleKey) : (image.alt || translate('projects.openPreview'));
+    }
+
+    resetLightboxZoom();
+    projectLightboxStage.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    projectLightboxModal.classList.add('is-open');
+    projectLightboxModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('lightbox-open');
+
+    const closeButton = projectLightboxModal.querySelector('.lightbox-close');
+    if (closeButton) closeButton.focus({ preventScroll: true });
+  };
+
+  const closeProjectLightbox = () => {
+    projectLightboxModal.classList.remove('is-open');
+    projectLightboxModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('lightbox-open');
+    projectLightboxImage.removeAttribute('src');
+    resetLightboxZoom();
+
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+      lastFocusedElement.focus({ preventScroll: true });
+    }
+  };
+
+  projectLightboxOpeners.forEach((screen) => {
+    screen.addEventListener('click', () => openProjectLightbox(screen));
+    screen.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openProjectLightbox(screen);
+      }
+    });
+  });
+
+  lightboxCloseButtons.forEach((button) => {
+    button.addEventListener('click', closeProjectLightbox);
+  });
+
+  if (lightboxZoomIn) {
+    lightboxZoomIn.addEventListener('click', () => setLightboxZoom(lightboxScale + 0.25));
+  }
+
+  if (lightboxZoomOut) {
+    lightboxZoomOut.addEventListener('click', () => setLightboxZoom(lightboxScale - 0.25));
+  }
+
+  if (lightboxReset) {
+    lightboxReset.addEventListener('click', resetLightboxZoom);
+  }
+
+  projectLightboxStage.addEventListener('wheel', (event) => {
+    if (!projectLightboxModal.classList.contains('is-open')) return;
+    event.preventDefault();
+    setLightboxZoom(lightboxScale + (event.deltaY < 0 ? 0.18 : -0.18));
+  }, { passive: false });
+
+  projectLightboxStage.addEventListener('pointerdown', (event) => {
+    if (lightboxScale <= 1.01) return;
+    dragStart = {
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      translateX: lightboxTranslateX,
+      translateY: lightboxTranslateY
+    };
+    projectLightboxStage.setPointerCapture(event.pointerId);
+  });
+
+  projectLightboxStage.addEventListener('pointermove', (event) => {
+    if (!dragStart || dragStart.pointerId !== event.pointerId) return;
+    lightboxTranslateX = dragStart.translateX + (event.clientX - dragStart.x);
+    lightboxTranslateY = dragStart.translateY + (event.clientY - dragStart.y);
+    applyLightboxTransform();
+  });
+
+  const endLightboxDrag = (event) => {
+    if (dragStart && dragStart.pointerId === event.pointerId) {
+      dragStart = null;
+    }
+  };
+
+  projectLightboxStage.addEventListener('pointerup', endLightboxDrag);
+  projectLightboxStage.addEventListener('pointercancel', endLightboxDrag);
+
+  document.addEventListener('keydown', (event) => {
+    if (!projectLightboxModal.classList.contains('is-open')) return;
+
+    if (event.key === 'Escape') {
+      closeProjectLightbox();
+    } else if (event.key === '+' || event.key === '=') {
+      setLightboxZoom(lightboxScale + 0.25);
+    } else if (event.key === '-' || event.key === '_') {
+      setLightboxZoom(lightboxScale - 0.25);
+    } else if (event.key === '0') {
+      resetLightboxZoom();
+    }
+  });
 }
 
 const supportsCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
