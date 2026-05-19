@@ -537,6 +537,7 @@ if (projectScreens.length) {
 }
 
 
+
 const projectLightboxModal = document.querySelector('[data-project-lightbox-modal]');
 const projectLightboxImage = document.querySelector('[data-lightbox-image]');
 const projectLightboxTitle = document.querySelector('[data-lightbox-title]');
@@ -554,6 +555,14 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   let dragStart = null;
   let lastFocusedElement = null;
 
+  const getProjectImage = (screen) => screen ? screen.querySelector('[data-project-scroll-image]') : null;
+
+  const getImageSource = (image) => {
+    if (!image) return '';
+    const source = image.dataset.fullSrc || image.getAttribute('src') || image.currentSrc || '';
+    return new URL(source, window.location.href).href;
+  };
+
   const applyLightboxTransform = () => {
     projectLightboxImage.style.transform = `translate3d(${lightboxTranslateX}px, ${lightboxTranslateY}px, 0) scale(${lightboxScale})`;
     projectLightboxStage.classList.toggle('is-zoomed', lightboxScale > 1.01);
@@ -568,13 +577,12 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   };
 
   const setLightboxZoom = (nextScale) => {
-    const previousScale = lightboxScale;
-    lightboxScale = Math.max(1, Math.min(4, Number(nextScale.toFixed(2))));
+    const next = Number(nextScale);
+    if (!Number.isFinite(next)) return;
+    lightboxScale = Math.max(1, Math.min(4, Number(next.toFixed(2))));
 
-    if (lightboxScale === 1) {
-      lightboxTranslateX = 0;
-      lightboxTranslateY = 0;
-    } else if (previousScale === 1) {
+    if (lightboxScale <= 1.01) {
+      lightboxScale = 1;
       lightboxTranslateX = 0;
       lightboxTranslateY = 0;
     }
@@ -583,20 +591,29 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   };
 
   const openProjectLightbox = (screen) => {
-    const image = screen.querySelector('[data-project-scroll-image]');
-    if (!image) return;
+    const image = getProjectImage(screen);
+    const src = getImageSource(image);
+    if (!src) return;
 
     lastFocusedElement = document.activeElement;
-    projectLightboxImage.src = image.currentSrc || image.src;
-    projectLightboxImage.alt = image.alt || translate('projects.openPreview');
+    projectLightboxImage.onload = () => {
+      projectLightboxImage.classList.remove('is-loading');
+      projectLightboxStage.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    };
+    projectLightboxImage.onerror = () => {
+      projectLightboxImage.classList.add('is-broken');
+    };
+    projectLightboxImage.classList.add('is-loading');
+    projectLightboxImage.classList.remove('is-broken');
+    projectLightboxImage.src = src;
+    projectLightboxImage.alt = image?.alt || translate('projects.openPreview');
 
     if (projectLightboxTitle) {
-      const titleKey = screen.dataset.lightboxTitleKey;
-      projectLightboxTitle.textContent = titleKey ? translate(titleKey) : (image.alt || translate('projects.openPreview'));
+      const titleKey = screen?.dataset.lightboxTitleKey;
+      projectLightboxTitle.textContent = titleKey ? translate(titleKey) : (image?.alt || translate('projects.openPreview'));
     }
 
     resetLightboxZoom();
-    projectLightboxStage.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     projectLightboxModal.classList.add('is-open');
     projectLightboxModal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('lightbox-open');
@@ -610,6 +627,7 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
     projectLightboxModal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('lightbox-open');
     projectLightboxImage.removeAttribute('src');
+    projectLightboxImage.classList.remove('is-loading', 'is-broken');
     resetLightboxZoom();
 
     if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
@@ -618,7 +636,16 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   };
 
   projectLightboxOpeners.forEach((screen) => {
-    screen.addEventListener('click', () => openProjectLightbox(screen));
+    const image = getProjectImage(screen);
+    if (image && !image.dataset.fullSrc) {
+      image.dataset.fullSrc = image.getAttribute('src') || '';
+    }
+
+    screen.addEventListener('click', (event) => {
+      event.preventDefault();
+      openProjectLightbox(screen);
+    });
+
     screen.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
@@ -645,6 +672,7 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
 
   projectLightboxStage.addEventListener('wheel', (event) => {
     if (!projectLightboxModal.classList.contains('is-open')) return;
+    if (!event.ctrlKey && Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
     event.preventDefault();
     setLightboxZoom(lightboxScale + (event.deltaY < 0 ? 0.18 : -0.18));
   }, { passive: false });
@@ -692,49 +720,8 @@ if (projectLightboxModal && projectLightboxImage && projectLightboxStage) {
   });
 }
 
-const supportsCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-const cursorDot = document.querySelector('.cursor-dot');
-const cursorGlow = document.querySelector('.cursor-glow');
+/* Removed: (function initProfessionalCursor() block. Native cursor and non-fixed header restored. */
 
-if (supportsCustomCursor && !prefersReducedMotion && cursorDot && cursorGlow) {
-  document.body.classList.add('has-custom-cursor');
 
-  let mouseX = -100;
-  let mouseY = -100;
-  let glowX = mouseX;
-  let glowY = mouseY;
+/* Removed: (function initMobileScrollHeader() block. Native cursor and non-fixed header restored. */
 
-  const updateCursor = () => {
-    glowX += (mouseX - glowX) * 0.16;
-    glowY += (mouseY - glowY) * 0.16;
-
-    cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
-    cursorGlow.style.transform = `translate3d(${glowX}px, ${glowY}px, 0) translate(-50%, -50%)`;
-
-    requestAnimationFrame(updateCursor);
-  };
-
-  document.addEventListener('pointermove', (event) => {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    document.body.classList.add('cursor-active');
-  }, { passive: true });
-
-  document.addEventListener('pointerleave', () => {
-    document.body.classList.remove('cursor-active');
-  });
-
-  document.addEventListener('pointerover', (event) => {
-    if (event.target.closest('a, button, input, textarea, select, [role="button"]')) {
-      document.body.classList.add('cursor-hover');
-    }
-  });
-
-  document.addEventListener('pointerout', (event) => {
-    if (event.target.closest('a, button, input, textarea, select, [role="button"]')) {
-      document.body.classList.remove('cursor-hover');
-    }
-  });
-
-  updateCursor();
-}
