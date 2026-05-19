@@ -3103,3 +3103,172 @@ textarea {
 .project-lightbox .lightbox-stage.is-zoomed {
   touch-action: none !important;
 }
+
+
+/* === Premium cursor restore + mobile header scroll behavior patch === */
+@media (hover: hover) and (pointer: fine) {
+  .cursor-dot,
+  .cursor-glow {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    border-radius: 999px;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .cursor-dot {
+    z-index: 100000;
+    width: 13px;
+    height: 13px;
+    background: radial-gradient(circle at 35% 35%, #fff7cb 0%, #f4cf75 58%, #d7b46a 100%) !important;
+    box-shadow:
+      0 0 12px rgba(247, 217, 139, .95),
+      0 0 28px rgba(247, 217, 139, .55),
+      0 0 58px rgba(125, 211, 252, .18) !important;
+    transition: opacity .14s ease, transform .08s linear, width .18s ease, height .18s ease, box-shadow .18s ease !important;
+  }
+
+  .cursor-glow {
+    z-index: 99999;
+    width: 74px;
+    height: 74px;
+    background:
+      radial-gradient(circle, rgba(255, 239, 180, .42) 0%, rgba(247, 217, 139, .20) 22%, rgba(125, 211, 252, .075) 42%, transparent 72%) !important;
+    filter: blur(5px);
+    mix-blend-mode: screen;
+    transition: opacity .18s ease, transform .12s linear !important;
+  }
+
+  body.has-custom-cursor {
+    cursor: none !important;
+  }
+
+  body.has-custom-cursor *:not(a):not(button):not(input):not(textarea):not(select):not(label):not(summary):not([role="button"]):not([tabindex]):not(.btn):not(.nav-cta):not(.icon-toggle):not(.mobile-menu-toggle):not(.project-media):not(.project-scroll-media):not(.social-link):not(.nav-social-link):not(.fixed-action-btn):not(.go-top-btn) {
+    cursor: none !important;
+  }
+
+  body.cursor-active:not(.cursor-hover) .cursor-dot {
+    opacity: 1 !important;
+  }
+
+  body.cursor-active:not(.cursor-hover) .cursor-glow {
+    opacity: .86 !important;
+  }
+
+  body.cursor-pressed:not(.cursor-hover) .cursor-dot {
+    width: 10px;
+    height: 10px;
+    box-shadow:
+      0 0 10px rgba(247, 217, 139, .98),
+      0 0 22px rgba(247, 217, 139, .44) !important;
+  }
+
+  body.cursor-hover .cursor-dot,
+  body.cursor-hover .cursor-glow {
+    opacity: 0 !important;
+  }
+
+  body.has-custom-cursor a,
+  body.has-custom-cursor button,
+  body.has-custom-cursor summary,
+  body.has-custom-cursor label,
+  body.has-custom-cursor [role="button"],
+  body.has-custom-cursor .btn,
+  body.has-custom-cursor .nav-cta,
+  body.has-custom-cursor .icon-toggle,
+  body.has-custom-cursor .mobile-menu-toggle,
+  body.has-custom-cursor .project-media,
+  body.has-custom-cursor .project-scroll-media,
+  body.has-custom-cursor .project-hover-hint,
+  body.has-custom-cursor .social-link,
+  body.has-custom-cursor .nav-social-link,
+  body.has-custom-cursor .fixed-action-btn,
+  body.has-custom-cursor .go-top-btn,
+  body.has-custom-cursor .lightbox-backdrop,
+  body.has-custom-cursor .lightbox-controls button {
+    cursor: pointer !important;
+  }
+
+  body.has-custom-cursor input,
+  body.has-custom-cursor textarea,
+  body.has-custom-cursor select {
+    cursor: text !important;
+  }
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .cursor-dot,
+  .cursor-glow {
+    display: none !important;
+  }
+}
+
+@media (max-width: 780px) {
+  .site-header {
+    width: 100% !important;
+  }
+
+  body.mobile-scroll-down:not(.nav-open) .site-header {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    transform: none !important;
+  }
+
+  body.mobile-scroll-up:not(.nav-open) .site-header,
+  body.mobile-at-top .site-header,
+  body.nav-open .site-header {
+    position: fixed !important;
+    top: 10px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    margin: 0 !important;
+    transform: translateY(0) !important;
+  }
+
+  body.mobile-scroll-up:not(.nav-open),
+  body.mobile-at-top,
+  body.nav-open {
+    --mobile-fixed-header-space: 82px;
+  }
+
+  body.mobile-scroll-up:not(.nav-open) .hero,
+  body.mobile-at-top .hero,
+  body.nav-open .hero {
+    padding-top: var(--mobile-fixed-header-space, 82px);
+  }
+
+  body.mobile-scroll-down:not(.nav-open) .hero {
+    padding-top: 0 !important;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body.has-custom-cursor a *,
+  body.has-custom-cursor button *,
+  body.has-custom-cursor summary *,
+  body.has-custom-cursor label *,
+  body.has-custom-cursor [role="button"] *,
+  body.has-custom-cursor .btn *,
+  body.has-custom-cursor .nav-cta *,
+  body.has-custom-cursor .icon-toggle *,
+  body.has-custom-cursor .mobile-menu-toggle *,
+  body.has-custom-cursor .project-media *,
+  body.has-custom-cursor .project-scroll-media *,
+  body.has-custom-cursor .project-hover-hint *,
+  body.has-custom-cursor .social-link *,
+  body.has-custom-cursor .nav-social-link *,
+  body.has-custom-cursor .fixed-action-btn *,
+  body.has-custom-cursor .go-top-btn *,
+  body.has-custom-cursor .lightbox-backdrop *,
+  body.has-custom-cursor .lightbox-controls button * {
+    cursor: pointer !important;
+  }
+}
